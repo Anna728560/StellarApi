@@ -9,7 +9,6 @@ from .models import (
     Ticket,
 )
 
-app_name = "planetarium"
 
 admin.site.register(AstronomyShow)
 admin.site.register(ShowTheme)
