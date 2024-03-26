@@ -11,7 +11,6 @@ class ShowTheme(models.Model):
     name = models.CharField(max_length=50)
     astronomy_shows = models.ManyToManyField(
         AstronomyShow,
-        on_delete=models.DO_NOTHING,
         related_name="show_themes",
     )
 
