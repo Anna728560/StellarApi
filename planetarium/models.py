@@ -6,6 +6,9 @@ class AstronomyShow(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
 
+    def __str__(self):
+        return self.title
+
 
 class ShowTheme(models.Model):
     name = models.CharField(max_length=50)
@@ -14,11 +17,17 @@ class ShowTheme(models.Model):
         related_name="show_themes",
     )
 
+    def __str__(self):
+        return self.name
+
 
 class PlanetariumDome(models.Model):
     name = models.CharField(max_length=100)
     rows = models.IntegerField()
     seats_in_row = models.IntegerField()
+
+    def __str__(self):
+        return self.name
 
 
 class ShowSession(models.Model):
@@ -34,6 +43,9 @@ class ShowSession(models.Model):
     )
     show_time = models.DateTimeField()
 
+    def __str__(self):
+        return self.planetarium_dome.name + " " + str(self.show_time)
+
 
 class Reservation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -42,6 +54,9 @@ class Reservation(models.Model):
         on_delete=models.CASCADE,
         related_name="reservations"
     )
+
+    def __str__(self):
+        return str(self.created_at)
 
 
 class Ticket(models.Model):
@@ -57,3 +72,8 @@ class Ticket(models.Model):
         on_delete=models.CASCADE,
         related_name="tickets"
     )
+
+    def __str__(self):
+        return (
+            f"{str(self.show_session)} (row: {self.row}, seat: {self.seat})"
+        )
