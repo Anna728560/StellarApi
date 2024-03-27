@@ -13,19 +13,19 @@ from .models import (
 class AstronomyShowSerializer(serializers.ModelSerializer):
     class Meta:
         model = AstronomyShow
-        fields = ("id", "title", "description", )
+        fields = ("id", "title", "description", "show_theme", )
 
 
 class ShowThemeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShowTheme
-        fields = ("id", "name", "astronomy_shows", )
+        fields = ("id", "name", )
 
 
 class PlanetariumDomeSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlanetariumDome
-        fields = ("id", "name", "rows", "seats_in_row", )
+        fields = ("id", "name", "rows", "seats_in_row", "capacity", )
 
 
 class ShowSessionSerializer(serializers.ModelSerializer):
