@@ -54,10 +54,11 @@ class PlanetariumDomeSerializer(serializers.ModelSerializer):
 class TicketSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         data = super(TicketSerializer, self).validate(attrs=attrs)
+        planetarium_dome = attrs.get("show_session").planetarium_dome
         Ticket.validate_ticket(
             attrs["row"],
             attrs["seat"],
-            attrs["show_session"].planetarium_dome,
+            planetarium_dome,
             ValidationError
         )
         return data
@@ -69,7 +70,6 @@ class TicketSerializer(serializers.ModelSerializer):
             "row",
             "seat",
             "show_session",
-            "reservation",
         )
 
 
@@ -129,15 +129,15 @@ class ShowSessionDetailSerializer(ShowSessionSerializer):
 
 
 class TicketListSerializer(TicketSerializer):
-    show_session = ShowSessionListSerializer(many=False, read_only=True)
+    show_session = ShowSessionListSerializer(read_only=True)
 
 
 class ReservationSerializer(serializers.ModelSerializer):
-    tickets = TicketSerializer(many=True, read_only=False, allow_empty=False)
+    tickets = TicketSerializer(many=True, read_only=False)
 
     class Meta:
         model = Reservation
-        fields = ("id", "created_at", "user", "tickets")
+        fields = ("id", "created_at", "tickets")
 
     def create(self, validated_data):
         with transaction.atomic():
