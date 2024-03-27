@@ -4,6 +4,7 @@ from django.db.models import Count, F
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets, mixins
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 
 from planetarium.models import (
@@ -158,6 +159,11 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
         return super().list(request, *args, **kwargs)
 
 
+class ReservationPagination(PageNumberPagination):
+    page_size = 10
+    max_page_size = 100
+
+
 class ReservationViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
@@ -169,6 +175,7 @@ class ReservationViewSet(
     )
     serializer_class = ReservationSerializer
     permission_classes = (IsAuthenticated,)
+    pagination_class = ReservationPagination
 
     def get_queryset(self):
         return Reservation.objects.filter(user=self.request.user)
