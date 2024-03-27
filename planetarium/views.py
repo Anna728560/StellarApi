@@ -77,13 +77,15 @@ class AstronomyShowViewSet(
         parameters=[
             OpenApiParameter(
                 "title",
-                type=str,
-                description="Filter AstronomyShow by title"
+                type=OpenApiTypes.STR,
+                description="Filter AstronomyShow by title "
+                            "(ex. ?title=fiction)"
             ),
             OpenApiParameter(
                 "show_theme",
                 type={"type": "list", "items": {"type": "number"}},
-                description="Filter AstronomyShow by show_theme id"
+                description="Filter AstronomyShow by show_theme id "
+                            "(ex. ?show_theme=1,3)"
             ),
         ]
     )
@@ -146,16 +148,19 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
             OpenApiParameter(
                 "astronomy_show",
                 type={"type": "list", "items": {"type": "number"}},
-                description="Filter AstronomyShow by astronomy_show id"
+                description="Filter show sessions by astronomy_show id "
+                            "(ex. ?astronomy_show=2)"
             ),
             OpenApiParameter(
                 "date",
                 type=OpenApiTypes.DATE,
-                description="Filter AstronomyShow session by date"
+                description="Filter show sessions by date "
+                            "(ex. ?date=2022-10-23)"
             ),
         ]
     )
     def list(self, request, *args, **kwargs):
+        """Get list of show sessions"""
         return super().list(request, *args, **kwargs)
 
 
