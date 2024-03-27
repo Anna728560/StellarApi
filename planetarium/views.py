@@ -1,3 +1,4 @@
+from django.db.models import Count, F
 from django.shortcuts import render
 from rest_framework import viewsets, mixins
 
@@ -16,6 +17,7 @@ from planetarium.serializers import (
     ShowSessionSerializer,
     ReservationSerializer,
     TicketSerializer,
+    ShowSessionListSerializer,
 )
 
 
@@ -35,8 +37,23 @@ class PlanetariumDomeViewSet(viewsets.ModelViewSet):
 
 
 class ShowSessionViewSet(viewsets.ModelViewSet):
-    queryset = ShowSession.objects.all()
+    queryset = (
+        ShowSession.objects.all()
+        .select_related("astronomy_show", "planetarium_dome")
+        .annotate(
+            tickets_available=(
+                    F("planetarium_dome__rows") * F("planetarium_dome__seats_in_row")
+                    - Count("tickets")
+            )
+        )
+    )
     serializer_class = ShowSessionSerializer
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return ShowSessionListSerializer
+
+        return ShowSessionSerializer
 
 
 class ReservationViewSet(viewsets.ModelViewSet):
