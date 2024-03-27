@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from .models import (
     AstronomyShow,
@@ -50,9 +51,31 @@ class PlanetariumDomeSerializer(serializers.ModelSerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
+    def validate(self, attrs):
+        data = super(TicketSerializer, self).validate(attrs=attrs)
+        Ticket.validate_ticket(
+            attrs["row"],
+            attrs["seat"],
+            attrs["show_session"].planetarium_dome,
+            ValidationError
+        )
+        return data
+
     class Meta:
         model = Ticket
-        fields = ("id", "row", "seat", "show_session", "reservation", )
+        fields = (
+            "id",
+            "row",
+            "seat",
+            "show_session",
+            "reservation",
+        )
+
+
+class TicketSeatsSerializer(TicketSerializer):
+    class Meta:
+        model = Ticket
+        fields = ("row", "seat")
 
 
 class ShowSessionSerializer(serializers.ModelSerializer):
@@ -89,7 +112,7 @@ class ShowSessionListSerializer(ShowSessionSerializer):
 class ShowSessionDetailSerializer(ShowSessionSerializer):
     astronomy_show = AstronomyShowListSerializer(many=False, read_only=True)
     planetarium_dome = PlanetariumDomeSerializer(many=False, read_only=True)
-    taken_places = TicketSerializer(
+    taken_places = TicketSeatsSerializer(
         source="tickets", many=True, read_only=True
     )
 
@@ -102,6 +125,10 @@ class ShowSessionDetailSerializer(ShowSessionSerializer):
             "planetarium_dome",
             "taken_places"
         )
+
+
+class TicketListSerializer(TicketSerializer):
+    show_session = ShowSessionListSerializer(many=False, read_only=True)
 
 
 class ReservationSerializer(serializers.ModelSerializer):
