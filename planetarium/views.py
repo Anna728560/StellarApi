@@ -1,5 +1,6 @@
 from django.db.models import Count, F
-from django.shortcuts import render
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets, mixins
 
 from planetarium.models import (
@@ -8,7 +9,6 @@ from planetarium.models import (
     PlanetariumDome,
     ShowSession,
     Reservation,
-    Ticket,
 )
 from planetarium.serializers import (
     AstronomyShowSerializer,
@@ -21,7 +21,8 @@ from planetarium.serializers import (
     PlanetariumDomeSerializer,
     ShowSessionSerializer,
     ReservationSerializer,
-    TicketSerializer, ShowSessionDetailSerializer, ReservationListSerializer,
+    ShowSessionDetailSerializer,
+    ReservationListSerializer,
 
 )
 
@@ -64,6 +65,23 @@ class AstronomyShowViewSet(
             return AstronomyShowDetailSerializer
 
         return AstronomyShowSerializer
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "title",
+                type=str,
+                description="Filter AstronomyShow by title"
+            ),
+            OpenApiParameter(
+                "show_theme",
+                type={"type": "list", "items": {"type": "number"}},
+                description="Filter AstronomyShow by show_theme id"
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class ShowThemeViewSet(viewsets.ModelViewSet):
