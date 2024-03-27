@@ -1,3 +1,5 @@
+import datetime
+
 from django.db.models import Count, F
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
@@ -107,6 +109,21 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
     )
     serializer_class = ShowSessionSerializer
 
+    def get_queryset(self):
+        date = self.request.query_params.get("date")
+        astronomy_show_id_str = self.request.query_params.get("astronomy_show")
+
+        queryset = self.queryset
+
+        if date:
+            date = datetime.strptime(date, "%Y-%m-%d").date()
+            queryset = queryset.filter(show_time__date=date)
+
+        if astronomy_show_id_str:
+            queryset = queryset.filter(astronomy_show_id=int(astronomy_show_id_str))
+
+        return queryset
+
     def get_serializer_class(self):
         if self.action == "list":
             return ShowSessionListSerializer
@@ -115,6 +132,23 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
             return ShowSessionDetailSerializer
 
         return ShowSessionSerializer
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "astronomy_show",
+                type={"type": "list", "items": {"type": "number"}},
+                description="Filter AstronomyShow by astronomy_show id"
+            ),
+            OpenApiParameter(
+                "date",
+                type=OpenApiTypes.DATE,
+                description="Filter AstronomyShow session by date"
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class ReservationViewSet(
