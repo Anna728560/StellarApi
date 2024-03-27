@@ -6,8 +6,8 @@ from .views import (
     PlanetariumDomeViewSet,
     ShowSessionViewSet,
     ReservationViewSet,
-
 )
+
 
 app_name = "planetarium"
 
