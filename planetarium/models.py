@@ -2,23 +2,23 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-class AstronomyShow(models.Model):
-    title = models.CharField(max_length=100)
-    description = models.TextField()
-
-    def __str__(self):
-        return self.title
-
-
 class ShowTheme(models.Model):
-    name = models.CharField(max_length=50)
-    astronomy_shows = models.ManyToManyField(
-        AstronomyShow,
-        related_name="show_themes",
-    )
+    name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
+
+
+class AstronomyShow(models.Model):
+    title = models.CharField(max_length=100)
+    description = models.TextField(null=True, blank=True)
+    show_theme = models.ManyToManyField(ShowTheme, related_name="astronomy_shows")
+
+    class Meta:
+        ordering = ("title", )
+
+    def __str__(self):
+        return self.title
 
 
 class PlanetariumDome(models.Model):
@@ -42,6 +42,9 @@ class ShowSession(models.Model):
         related_name="show_sessions"
     )
     show_time = models.DateTimeField()
+
+    class Meta:
+        ordering = ("-show_time", )
 
     def __str__(self):
         return self.planetarium_dome.name + " " + str(self.show_time)
