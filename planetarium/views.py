@@ -47,11 +47,15 @@ class AstronomyShowViewSet(
 
     @staticmethod
     def _params_to_ints(qs):
-        """Converts a list of string IDs to a list of integers"""
+        """
+        Converts a list of string IDs to a list of integers
+        """
         return [int(str_id) for str_id in qs.split(",")]
 
     def get_queryset(self):
-        """Retrieve the Astronomy Show with filters"""
+        """
+        Retrieve the Astronomy Show with filters
+        """
         title = self.request.query_params.get("title")
         show_theme = self.request.query_params.get("show_theme")
 
@@ -67,7 +71,9 @@ class AstronomyShowViewSet(
         return queryset.distinct()
 
     def get_serializer_class(self):
-        """Return the appropriate serializer class based on the action."""
+        """
+        Return the appropriate serializer class based on the action.
+        """
         if self.action == "list":
             return AstronomyShowListSerializer
         elif self.action == "retrieve":
@@ -91,7 +97,9 @@ class AstronomyShowViewSet(
         ]
     )
     def list(self, request, *args, **kwargs):
-        """List all AstronomyShows."""
+        """
+        List all AstronomyShows.
+        """
         return super().list(request, *args, **kwargs)
 
 
@@ -128,7 +136,9 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_queryset(self):
-        """Filter queryset based on query parameters."""
+        """
+        Filter queryset based on query parameters.
+        """
         date = self.request.query_params.get("date")
         astronomy_show_id_str = self.request.query_params.get("astronomy_show")
 
@@ -144,7 +154,9 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
-        """Return appropriate serializer class based on action."""
+        """
+        Return appropriate serializer class based on action.
+        """
         if self.action == "list":
             return ShowSessionListSerializer
         if self.action == "retrieve":
@@ -168,7 +180,9 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
         ]
     )
     def list(self, request, *args, **kwargs):
-        """Get list of show sessions."""
+        """
+        Get list of show sessions.
+        """
         return super().list(request, *args, **kwargs)
 
 
@@ -195,16 +209,22 @@ class ReservationViewSet(
     pagination_class = ReservationPagination
 
     def get_queryset(self):
-        """Get the reservations associated with the current user."""
+        """
+        Get the reservations associated with the current user.
+        """
         return Reservation.objects.filter(user=self.request.user)
 
     def get_serializer_class(self):
-        """Use different serializers based on the action."""
+        """
+        Use different serializers based on the action.
+        """
         if self.action == "list":
             return ReservationListSerializer
 
         return ReservationSerializer
 
     def perform_create(self, serializer):
-        """Set the user when creating a new reservation."""
+        """
+        Set the user when creating a new reservation.
+        """
         serializer.save(user=self.request.user)

@@ -15,30 +15,48 @@ ASTRONOMY_SHOW_URL = reverse("planetarium:astronomyshow-list")
 
 
 def sample_astronomy_show(**params) -> AstronomyShow:
+    """
+    Create a sample astronomy show for testing purposes.
+    """
     defaults = {
         "title": "Sample astronomy show",
         "description": "Some description",
     }
     defaults.update(params)
-
     return AstronomyShow.objects.create(**defaults)
 
 
 def detail_url(astronomy_show_id):
+    """
+    Return the URL for the detail view of an astronomy show
+    """
     return reverse("planetarium:astronomyshow-detail", args=[astronomy_show_id])
 
 
 class UnauthenticatedAstronomyShowApiTest(TestCase):
+    """
+    Test unauthenticated access to the astronomy show API.
+    """
     def setUp(self) -> None:
+        """
+        Set up the test case.
+        """
         self.client = APIClient()
 
     def test_auth_required(self):
+        """
+        Test that authentication is required for accessing the API.
+        """
         res = self.client.get(ASTRONOMY_SHOW_URL)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class AuthenticatedAstronomyShowApiTest(TestCase):
+    """
+    Test authenticated access to the Astronomy Show API
+    """
     def setUp(self) -> None:
+        """Set up the test environment"""
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
             "test@user.com",
@@ -46,7 +64,10 @@ class AuthenticatedAstronomyShowApiTest(TestCase):
         )
         self.client.force_authenticate(self.user)
 
-    def test_list_movies(self):
+    def test_list_astronomy_shows(self):
+        """
+        Test listing all astronomy shows
+        """
         sample_astronomy_show()
         sample_astronomy_show_with_show_theme = sample_astronomy_show()
 
@@ -56,13 +77,16 @@ class AuthenticatedAstronomyShowApiTest(TestCase):
 
         res = self.client.get(ASTRONOMY_SHOW_URL)
 
-        astronomy_show = AstronomyShow.objects.all()
-        serializer = AstronomyShowListSerializer(astronomy_show, many=True)
+        astronomy_shows = AstronomyShow.objects.all()
+        serializer = AstronomyShowListSerializer(astronomy_shows, many=True)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
 
     def test_filter_astronomy_show_by_title(self):
+        """
+        Test filtering astronomy shows by title
+        """
         astronomy_show1 = sample_astronomy_show(title="AstroShow")
         astronomy_show2 = sample_astronomy_show(title="StarSpot")
 
@@ -75,6 +99,9 @@ class AuthenticatedAstronomyShowApiTest(TestCase):
         self.assertNotIn(serializer2.data, res.data)
 
     def test_filter_astronomy_show_by_show_theme(self):
+        """
+        Test filtering astronomy shows by show theme
+        """
         astronomy_show1 = sample_astronomy_show(title="AstroShow")
         astronomy_show2 = sample_astronomy_show(title="StarSpot")
         astronomy_show3 = sample_astronomy_show(title="Show without show_theme")
@@ -98,12 +125,15 @@ class AuthenticatedAstronomyShowApiTest(TestCase):
         self.assertNotIn(serializer3.data, res.data)
 
     def test_retrieve_astronomy_show_detail(self):
+        """
+        Test retrieving individual astronomy show details
+        """
         astronomy_show1 = sample_astronomy_show(title="AstroAdventure")
         show_theme1 = ShowTheme.objects.create(name="BigSpace")
 
         astronomy_show1.show_theme.add(show_theme1)
 
-        url = detail_url(astronomy_show1.id)
+        url = reverse("planetarium:astronomyshow-detail", args=[astronomy_show1.id])
 
         res = self.client.get(url)
 
@@ -113,6 +143,9 @@ class AuthenticatedAstronomyShowApiTest(TestCase):
         self.assertEqual(res.data, serializer.data)
 
     def test_create_astronomy_show_forbidden(self):
+        """
+        Test creating a new astronomy show (forbidden for regular users)
+        """
         payload = {
             "title": "CosmosCraze",
             "description": "Some description",
@@ -123,7 +156,11 @@ class AuthenticatedAstronomyShowApiTest(TestCase):
 
 
 class AdminAstronomyShowApiTests(TestCase):
+    """
+    Test Astronomy Show API for admin users
+    """
     def setUp(self) -> None:
+        """Set up the test environment"""
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
             "admin@test.com", "password123", is_staff=True
@@ -131,6 +168,9 @@ class AdminAstronomyShowApiTests(TestCase):
         self.client.force_authenticate(self.user)
 
     def test_put_or_delete_astronomy_show_not_allowed(self):
+        """
+        Test that PUT and DELETE methods are not allowed for admin users
+        """
         astronomy_show = sample_astronomy_show()
 
         url = detail_url(astronomy_show.id)
