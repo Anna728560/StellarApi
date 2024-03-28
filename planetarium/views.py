@@ -39,6 +39,8 @@ class AstronomyShowViewSet(
     mixins.RetrieveModelMixin,
     viewsets.GenericViewSet,
 ):
+    """ViewSet for managing Astronomy Shows."""
+
     queryset = AstronomyShow.objects.all()
     serializer_class = AstronomyShowSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
@@ -49,7 +51,7 @@ class AstronomyShowViewSet(
         return [int(str_id) for str_id in qs.split(",")]
 
     def get_queryset(self):
-        """Retrieve the AstronomyShow with filters"""
+        """Retrieve the Astronomy Show with filters"""
         title = self.request.query_params.get("title")
         show_theme = self.request.query_params.get("show_theme")
 
@@ -65,12 +67,11 @@ class AstronomyShowViewSet(
         return queryset.distinct()
 
     def get_serializer_class(self):
+        """Return the appropriate serializer class based on the action."""
         if self.action == "list":
             return AstronomyShowListSerializer
-
-        if self.action == "retrieve":
+        elif self.action == "retrieve":
             return AstronomyShowDetailSerializer
-
         return AstronomyShowSerializer
 
     @extend_schema(
@@ -90,22 +91,29 @@ class AstronomyShowViewSet(
         ]
     )
     def list(self, request, *args, **kwargs):
+        """List all AstronomyShows."""
         return super().list(request, *args, **kwargs)
 
 
 class ShowThemeViewSet(viewsets.ModelViewSet):
+    """Viewset for managing show themes."""
+
     queryset = ShowTheme.objects.all()
     serializer_class = ShowThemeSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
 class PlanetariumDomeViewSet(viewsets.ModelViewSet):
+    """Viewset for managing planetarium domes."""
+
     queryset = PlanetariumDome.objects.all()
     serializer_class = PlanetariumDomeSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
 class ShowSessionViewSet(viewsets.ModelViewSet):
+    """Viewset for managing show sessions."""
+
     queryset = (
         ShowSession.objects.all()
         .select_related("astronomy_show", "planetarium_dome")
@@ -120,6 +128,7 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_queryset(self):
+        """Filter queryset based on query parameters."""
         date = self.request.query_params.get("date")
         astronomy_show_id_str = self.request.query_params.get("astronomy_show")
 
@@ -135,12 +144,11 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
+        """Return appropriate serializer class based on action."""
         if self.action == "list":
             return ShowSessionListSerializer
-
         if self.action == "retrieve":
             return ShowSessionDetailSerializer
-
         return ShowSessionSerializer
 
     @extend_schema(
@@ -160,11 +168,13 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
         ]
     )
     def list(self, request, *args, **kwargs):
-        """Get list of show sessions"""
+        """Get list of show sessions."""
         return super().list(request, *args, **kwargs)
 
 
 class ReservationPagination(PageNumberPagination):
+    """Pagination class for reservation listings."""
+
     page_size = 10
     max_page_size = 100
 
@@ -174,6 +184,8 @@ class ReservationViewSet(
     mixins.CreateModelMixin,
     viewsets.GenericViewSet,
 ):
+    """A ViewSet for listing and creating reservations."""
+
     queryset = Reservation.objects.prefetch_related(
         "tickets__show_session__astronomy_show",
         "tickets__show_session__planetarium_dome",
@@ -183,13 +195,16 @@ class ReservationViewSet(
     pagination_class = ReservationPagination
 
     def get_queryset(self):
+        """Get the reservations associated with the current user."""
         return Reservation.objects.filter(user=self.request.user)
 
     def get_serializer_class(self):
+        """Use different serializers based on the action."""
         if self.action == "list":
             return ReservationListSerializer
 
         return ReservationSerializer
 
     def perform_create(self, serializer):
+        """Set the user when creating a new reservation."""
         serializer.save(user=self.request.user)
