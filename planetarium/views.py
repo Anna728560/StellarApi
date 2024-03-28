@@ -161,6 +161,7 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
             return ShowSessionListSerializer
         if self.action == "retrieve":
             return ShowSessionDetailSerializer
+
         return ShowSessionSerializer
 
     @extend_schema(
