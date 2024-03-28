@@ -37,6 +37,7 @@ class UnauthenticatedAstronomyShowApiTest(TestCase):
     """
     Test unauthenticated access to the astronomy show API.
     """
+
     def setUp(self) -> None:
         """
         Set up the test case.
@@ -55,6 +56,7 @@ class AuthenticatedAstronomyShowApiTest(TestCase):
     """
     Test authenticated access to the Astronomy Show API
     """
+
     def setUp(self) -> None:
         """Set up the test environment"""
         self.client = APIClient()
@@ -159,6 +161,7 @@ class AdminAstronomyShowApiTests(TestCase):
     """
     Test Astronomy Show API for admin users
     """
+
     def setUp(self) -> None:
         """Set up the test environment"""
         self.client = APIClient()

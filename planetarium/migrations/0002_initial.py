@@ -10,43 +10,65 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('planetarium', '0001_initial'),
+        ("planetarium", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='reservation',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reservations', to=settings.AUTH_USER_MODEL),
+            model_name="reservation",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="reservations",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='showsession',
-            name='astronomy_show',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='show_sessions', to='planetarium.astronomyshow'),
+            model_name="showsession",
+            name="astronomy_show",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="show_sessions",
+                to="planetarium.astronomyshow",
+            ),
         ),
         migrations.AddField(
-            model_name='showsession',
-            name='planetarium_dome',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='show_sessions', to='planetarium.planetariumdome'),
+            model_name="showsession",
+            name="planetarium_dome",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="show_sessions",
+                to="planetarium.planetariumdome",
+            ),
         ),
         migrations.AddField(
-            model_name='astronomyshow',
-            name='show_theme',
-            field=models.ManyToManyField(related_name='astronomy_shows', to='planetarium.showtheme'),
+            model_name="astronomyshow",
+            name="show_theme",
+            field=models.ManyToManyField(
+                related_name="astronomy_shows", to="planetarium.showtheme"
+            ),
         ),
         migrations.AddField(
-            model_name='ticket',
-            name='reservation',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='tickets', to='planetarium.reservation'),
+            model_name="ticket",
+            name="reservation",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="tickets",
+                to="planetarium.reservation",
+            ),
         ),
         migrations.AddField(
-            model_name='ticket',
-            name='show_session',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='tickets', to='planetarium.showsession'),
+            model_name="ticket",
+            name="show_session",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="tickets",
+                to="planetarium.showsession",
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='ticket',
-            unique_together={('show_session', 'row', 'seat')},
+            name="ticket",
+            unique_together={("show_session", "row", "seat")},
         ),
     ]

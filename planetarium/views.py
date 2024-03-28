@@ -19,15 +19,11 @@ from planetarium.serializers import (
     AstronomyShowSerializer,
     AstronomyShowDetailSerializer,
     AstronomyShowListSerializer,
-
     ShowThemeSerializer,
     ShowSessionListSerializer,
-
     PlanetariumDomeSerializer,
-
     ShowSessionSerializer,
     ShowSessionDetailSerializer,
-
     ReservationSerializer,
     ReservationListSerializer,
 )
@@ -85,14 +81,13 @@ class AstronomyShowViewSet(
             OpenApiParameter(
                 "title",
                 type=OpenApiTypes.STR,
-                description="Filter AstronomyShow by title "
-                            "(ex. ?title=fiction)"
+                description="Filter AstronomyShow by title " "(ex. ?title=fiction)",
             ),
             OpenApiParameter(
                 "show_theme",
                 type={"type": "list", "items": {"type": "number"}},
                 description="Filter AstronomyShow by show_theme id "
-                            "(ex. ?show_theme=1,3)"
+                "(ex. ?show_theme=1,3)",
             ),
         ]
     )
@@ -127,8 +122,8 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
         .select_related("astronomy_show", "planetarium_dome")
         .annotate(
             tickets_available=(
-                    F("planetarium_dome__rows") * F("planetarium_dome__seats_in_row")
-                    - Count("tickets")
+                F("planetarium_dome__rows") * F("planetarium_dome__seats_in_row")
+                - Count("tickets")
             )
         )
     )
@@ -170,13 +165,12 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
                 "astronomy_show",
                 type={"type": "list", "items": {"type": "number"}},
                 description="Filter show sessions by astronomy_show id "
-                            "(ex. ?astronomy_show=2)"
+                "(ex. ?astronomy_show=2)",
             ),
             OpenApiParameter(
                 "date",
                 type=OpenApiTypes.DATE,
-                description="Filter show sessions by date "
-                            "(ex. ?date=2022-10-23)"
+                description="Filter show sessions by date " "(ex. ?date=2022-10-23)",
             ),
         ]
     )
